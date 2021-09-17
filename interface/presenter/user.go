@@ -16,7 +16,5 @@ func NewUserPresenter() User {
 }
 
 func (up *user) ResponseUsers(us []*model.User) []*model.User {
-	//TODO: Transform data
-
 	return us
 }
