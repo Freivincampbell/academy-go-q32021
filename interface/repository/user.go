@@ -1,5 +1,12 @@
 package repository
 
+import (
+	"encoding/csv"
+	"fmt"
+	"io"
+	"os"
+)
+
 var filePath = "./public/data.csv"
 
 type user struct {
@@ -15,5 +22,41 @@ func NewUserRepository() User {
 
 func (ur *user) ReadUsers(f string) (string, error) {
 	f = filePath
+
+	csvFile, err := openFile(f)
+	if err != nil {
+		return "", err
+	}
+
+	err = validateCSV(csvFile)
+	if err != nil {
+		return "", err
+	}
+
 	return f, nil
+}
+
+func openFile(f string) (*os.File, error) {
+	csvFile, err := os.Open(f)
+	if err != nil {
+		err = fmt.Errorf("path provided was not found, path:, %v", f)
+		return nil, err
+	}
+	return csvFile, nil
+}
+
+func validateCSV(csvFile *os.File) error {
+	r := csv.NewReader(csvFile)
+	for {
+		_, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			err = fmt.Errorf("wrong number of fields or wrong format")
+			return err
+		}
+	}
+
+	return nil
 }
