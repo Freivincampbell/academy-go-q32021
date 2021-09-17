@@ -15,8 +15,8 @@ type User struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Phone   string `json:"phone"`
-	Website string `json:"website"`
+	Phone    string `json:"phone"`
+	Website  string `json:"website"`
 }
 
 func (User) TableName() string { return "users" }

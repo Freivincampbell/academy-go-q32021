@@ -7,17 +7,19 @@ Here, you'll find instructions for completing your certification.
 
 ## The Challenge
 
-The purpose of the challenge is for you to demonstrate your Golang skills. This is your chance to show off everything you've learned during the course!!
+The purpose of the challenge is for you to demonstrate your Golang skills. This is your chance to show off everything
+you've learned during the course!!
 
-You will build and deliver a whole Golang project on your own. We don't want to limit you by providing some fill-in-the-blanks exercises, but instead request you to build it from scratch.
-We hope you find this exercise challenging and engaging.
+You will build and deliver a whole Golang project on your own. We don't want to limit you by providing some
+fill-in-the-blanks exercises, but instead request you to build it from scratch. We hope you find this exercise
+challenging and engaging.
 
 The goal is to build a REST API which must include:
 
 - An endpoint for reading from an external API
-  - Write the information in a CSV file
+    - Write the information in a CSV file
 - An endpoint for reading the CSV
-  - Display the information as a JSON
+    - Display the information as a JSON
 - An endpoint for reading the CSV concurrently with some criteria (details below)
 - Unit testing for the principal logic
 - Follow conventions, best practices
@@ -29,15 +31,15 @@ The goal is to build a REST API which must include:
 These are the main requirements we will evaluate:
 
 - Use all that you've learned in the course:
-  - Best practices
-  - Go basics
-  - HTTP handlers
-  - Error handling
-  - Structs and interfaces
-  - Clean architecture
-  - Unit testing
-  - CSV file fetching
-  - Concurrency
+    - Best practices
+    - Go basics
+    - HTTP handlers
+    - Error handling
+    - Structs and interfaces
+    - Clean architecture
+    - Unit testing
+    - CSV file fetching
+    - Concurrency
 
 ## Getting Started
 
@@ -50,9 +52,11 @@ To get started, follow these steps:
 
 ## Deliverables
 
-We provide the delivery dates so you can plan accordingly; please take this challenge seriously and try to make progress constantly.
+We provide the delivery dates so you can plan accordingly; please take this challenge seriously and try to make progress
+constantly.
 
-For the final deliverable, we will provide some feedback, but there is no extra review date. If you are struggling with something, contact the mentors and peers to get help on time. Feel free to use the slack channel available.
+For the final deliverable, we will provide some feedback, but there is no extra review date. If you are struggling with
+something, contact the mentors and peers to get help on time. Feel free to use the slack channel available.
 
 ## First Deliverable (due September 24th 23:59PM)
 
@@ -107,9 +111,9 @@ items_per_workers: Is an Int and is the amount of valid items the worker should 
 - The result should be displayed as a response
 - The response should be displayed when:
 
-  - The workers reached the limit
-  - EOF
-  - Valid items completed
+    - The workers reached the limit
+    - EOF
+    - Valid items completed
 
 > Important: this is the final deliverable, so all the requirements must be included. We will give you feedback on October 18th. You will have 2 days more to apply changes. On October 20th, we will stop receiving changes at 11:00 am.
 
@@ -160,10 +164,10 @@ For submitting your work, you should follow these steps:
 - [Packages](https://www.youtube.com/watch?v=sf7f4QGkwfE)
 - [Failed requests handling](http://www.metabates.com/2015/10/15/handling-http-request-errors-in-go/)
 - [Modules](https://www.youtube.com/watch?v=Z1VhG7cf83M)
-  - [Part 1 and 2](https://blog.golang.org/using-go-modules)
+    - [Part 1 and 2](https://blog.golang.org/using-go-modules)
 - [Unit testing](https://golang.org/pkg/testing/)
 - [Go tools](https://dominik.honnef.co/posts/2014/12/an_incomplete_list_of_go_tools/)
 - [More Go tools](https://dev.to/plutov/go-tools-are-awesome-bom)
 - [Functions as values](https://tour.golang.org/moretypes/24)
 - [Concurrency (goroutines, channels, workers)](https://medium.com/@trevor4e/learning-gos-concurrency-through-illustrations-8c4aff603b3)
-  - [Concurrency Part 2](https://www.youtube.com/watch?v=LvgVSSpwND8)
+    - [Concurrency Part 2](https://www.youtube.com/watch?v=LvgVSSpwND8)

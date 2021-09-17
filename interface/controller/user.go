@@ -26,6 +26,5 @@ func (uc *user) GetUsers(c Context) error {
 		return err
 	}
 
-
 	return c.JSON(http.StatusOK, u)
 }
