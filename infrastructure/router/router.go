@@ -10,7 +10,9 @@ func NewRouter(e *echo.Echo, c controller.App) *echo.Echo {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/users", func(context echo.Context) error { return c.User.GetUsers(context) })
+	e.GET("/read-users", func(context echo.Context) error {
+		return c.User.ReadUsers(context)
+	})
 
 	return e
 }
