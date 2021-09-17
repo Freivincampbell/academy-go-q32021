@@ -33,23 +33,13 @@ func ReadConfig() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
-	var yamlExample = []byte(`
-database:
-  user: root
-  password:
-  net: tcp
-  addr: 127.0.0.1:3306
-  dbname: golang-clean-architecture
-  allowNativePasswords: true
-  params:
-    parseTime: "true"
-
+	var yamlConfig = []byte(`
 server:
   address: 8080
 `)
 	viper.AutomaticEnv()
 
-	if err := viper.ReadConfig(bytes.NewBuffer(yamlExample)); err != nil {
+	if err := viper.ReadConfig(bytes.NewBuffer(yamlConfig)); err != nil {
 		fmt.Println(err)
 		log.Fatalln(err)
 	}

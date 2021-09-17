@@ -2,7 +2,6 @@ package main
 
 import (
 	"academy-go-q32021/config"
-	"academy-go-q32021/infrastructure/datastore"
 	"academy-go-q32021/infrastructure/router"
 	"academy-go-q32021/registry"
 	"fmt"
@@ -14,11 +13,7 @@ import (
 func main() {
 	config.ReadConfig()
 
-	db := datastore.NewDB()
-	db.LogMode(true)
-	defer db.Close()
-
-	r := registry.NewRegistry(db)
+	r := registry.NewRegistry()
 
 	e := echo.New()
 	e = router.NewRouter(e, r.NewAppController())

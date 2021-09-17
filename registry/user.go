@@ -18,7 +18,7 @@ func (r *registry) NewUserInteractor() interactor.User {
 }
 
 func (r *registry) NewUserRepository() ur.User {
-	return ir.NewUserRepository(r.db)
+	return ir.NewUserRepository()
 }
 
 func (r *registry) NewUserPresenter() up.User {
