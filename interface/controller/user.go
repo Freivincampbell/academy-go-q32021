@@ -2,6 +2,7 @@ package controller
 
 import (
 	"academy-go-q32021/usecase/interactor"
+	"net/http"
 )
 
 type user struct {
@@ -21,7 +22,7 @@ func (uc *user) ReadUsers(c Context) error {
 
 	f, err := uc.user.ReadUsers(f)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	return c.File(f)
