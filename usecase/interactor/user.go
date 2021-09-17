@@ -1,7 +1,6 @@
 package interactor
 
 import (
-	"academy-go-q32021/domain/model"
 	"academy-go-q32021/usecase/presenter"
 	"academy-go-q32021/usecase/repository"
 )
@@ -12,18 +11,18 @@ type user struct {
 }
 
 type User interface {
-	Get(u []*model.User) ([]*model.User, error)
+	ReadUsers(f string) (string, error)
 }
 
 func NewUserInteractor(r repository.User, p presenter.User) User {
 	return &user{r, p}
 }
 
-func (us *user) Get(u []*model.User) ([]*model.User, error) {
-	u, err := us.UserRepository.FindAll(u)
+func (us *user) ReadUsers(f string) (string, error) {
+	file, err := us.UserRepository.ReadUsers(f)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return us.UserPresenter.ResponseUsers(u), nil
+	return us.UserPresenter.ResponseReadUsers(file), nil
 }
