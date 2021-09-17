@@ -1,20 +1,16 @@
 package presenter
 
-import (
-	"academy-go-q32021/domain/model"
-)
-
 type user struct {
 }
 
 type User interface {
-	ResponseUsers(us []*model.User) []*model.User
+	ResponseReadUsers(f string) string
 }
 
 func NewUserPresenter() User {
 	return &user{}
 }
 
-func (up *user) ResponseUsers(us []*model.User) []*model.User {
-	return us
+func (up *user) ResponseReadUsers(f string) string {
+	return f
 }
