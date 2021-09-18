@@ -39,7 +39,7 @@ func (ur *user) ReadUsers(f string) (string, error) {
 func openFile(f string) (*os.File, error) {
 	csvFile, err := os.Open(f)
 	if err != nil {
-		err = fmt.Errorf("path provided was not found, path:, %v", f)
+		err = fmt.Errorf("path provided was not found")
 		return nil, err
 	}
 	return csvFile, nil
