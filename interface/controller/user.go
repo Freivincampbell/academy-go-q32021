@@ -21,6 +21,7 @@ func (uc *user) ReadUsers(c Context) error {
 	f := "./public/data.csv"
 
 	f, err := uc.user.ReadUsers(f)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
