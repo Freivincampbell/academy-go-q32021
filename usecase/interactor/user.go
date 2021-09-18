@@ -12,6 +12,7 @@ type user struct {
 
 type User interface {
 	ReadUsers(f string) (string, error)
+	ReadUsersByKey(k string) (string, error)
 }
 
 func NewUserInteractor(r repository.User, p presenter.User) User {
@@ -25,4 +26,12 @@ func (us *user) ReadUsers(f string) (string, error) {
 	}
 
 	return us.UserPresenter.ResponseReadUsers(file), nil
+}
+func (us *user) ReadUsersByKey(k string) (string, error) {
+	key, err := us.UserRepository.ReadUsersByKey(k)
+	if err != nil {
+		return "", err
+	}
+
+	return us.UserPresenter.ResponseReadUsersByKey(key), nil
 }

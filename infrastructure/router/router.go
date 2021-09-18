@@ -13,6 +13,9 @@ func NewRouter(e *echo.Echo, c controller.App) *echo.Echo {
 	e.GET("/read-users", func(context echo.Context) error {
 		return c.User.ReadUsers(context)
 	})
+	e.GET("/users", func(context echo.Context) error {
+		return c.User.ReadUsersByKey(context)
+	})
 
 	return e
 }
