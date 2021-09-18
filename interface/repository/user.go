@@ -7,8 +7,6 @@ import (
 	"os"
 )
 
-var filePath = "./public/data.csv"
-
 type user struct {
 }
 
@@ -21,8 +19,6 @@ func NewUserRepository() User {
 }
 
 func (ur *user) ReadUsers(f string) (string, error) {
-	f = filePath
-
 	csvFile, err := openFile(f)
 	if err != nil {
 		return "", err

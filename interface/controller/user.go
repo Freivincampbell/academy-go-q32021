@@ -18,7 +18,7 @@ func NewUserController(us interactor.User) User {
 }
 
 func (uc *user) ReadUsers(c Context) error {
-	f := "./public/invalid.csv"
+	f := "./public/data.csv"
 
 	f, err := uc.user.ReadUsers(f)
 	if err != nil {
