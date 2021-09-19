@@ -5,17 +5,18 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
 )
 
-type user struct {
-}
+type user struct{}
 
 type User interface {
 	ReadUsers(f string) ([]*model.User, error)
 	ReadUsersByKey(f string) ([]*model.CustomCSV, error)
+	GetUsers(u []*model.User) ([]*model.User, error)
 }
 
 func NewUserRepository() User {
@@ -62,6 +63,25 @@ func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
 	}
 
 	return jsonData, nil
+}
+
+func (ur *user) GetUsers(u []*model.User) ([]*model.User, error) {
+	response, err := http.Get("https://jsonplaceholder.typicode.com/users")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.NewDecoder(response.Body).Decode(&u)
+	if err != nil {
+		return nil, err
+	}
+
+	err = storeInCSV(u)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
 }
 
 func openFile(f string) (*os.File, error) {
@@ -111,7 +131,7 @@ func transformData(csvData [][]string) ([]*model.User, error) {
 
 	for i, each := range csvData {
 		if i != 0 {
-			oneRecord.Id , _ = strconv.Atoi(strings.TrimSpace(each[0]))
+			oneRecord.Id, _ = strconv.Atoi(strings.TrimSpace(each[0]))
 			oneRecord.Name = strings.TrimSpace(each[1])
 			oneRecord.Username = strings.TrimSpace(each[2])
 			oneRecord.Email = strings.TrimSpace(each[3])
@@ -125,4 +145,48 @@ func transformData(csvData [][]string) ([]*model.User, error) {
 	var jsonData []*model.User
 	err = json.Unmarshal(r, &jsonData)
 	return jsonData, err
+}
+
+func storeInCSV(us []*model.User) error {
+	csvFile, err := os.Create("./public/data.csv")
+
+	if err != nil {
+		return err
+	}
+	defer func(csvFile *os.File) {
+		err := csvFile.Close()
+		if err != nil {
+			return
+		}
+	}(csvFile)
+
+	writer := csv.NewWriter(csvFile)
+
+	var row []string
+	row = append(row, "Id", "Name", "Username", "Email", "Phone", "Website")
+
+	err = writer.Write(row)
+	if err != nil {
+		return err
+	}
+
+	row = nil
+	for _, u := range us {
+		row = append(row, strconv.Itoa(u.Id))
+		row = append(row, u.Name)
+		row = append(row, u.Username)
+		row = append(row, u.Email)
+		row = append(row, u.Phone)
+		row = append(row, u.Website)
+		err := writer.Write(row)
+		if err != nil {
+			return err
+		}
+
+		row = nil
+	}
+
+	writer.Flush()
+
+	return nil
 }
