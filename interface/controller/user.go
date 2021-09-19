@@ -21,21 +21,21 @@ func NewUserController(us interactor.User) User {
 func (uc *user) ReadUsers(c Context) error {
 	f := "./public/data.csv"
 
-	f, err := uc.user.ReadUsers(f)
+	u, err := uc.user.ReadUsers(f)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.File(f)
+	return c.JSON(http.StatusOK, u)
 }
 func (uc *user) ReadUsersByKey(c Context) error {
 	k := c.QueryParam("key")
 
-	f, err := uc.user.ReadUsersByKey(k)
+	u, err := uc.user.ReadUsersByKey(k)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.File(f)
+	return c.JSON(http.StatusOK, u)
 }
