@@ -1,68 +1,67 @@
 package repository
 
 import (
+	"academy-go-q32021/domain/model"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
 type user struct {
 }
 
-type Data struct {
-	Value string `json:"value"`
-}
-
 type User interface {
-	ReadUsers(f string) (string, error)
-	ReadUsersByKey(f string) (string, error)
+	ReadUsers(f string) ([]*model.User, error)
+	ReadUsersByKey(f string) ([]*model.CustomCSV, error)
 }
 
 func NewUserRepository() User {
 	return &user{}
 }
 
-func (ur *user) ReadUsers(f string) (string, error) {
+func (ur *user) ReadUsers(f string) ([]*model.User, error) {
 	csvFile, err := openFile(f)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	err = validateCSV(csvFile)
+	defer csvFile.Close()
+
+	data, err := readFile(csvFile)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return f, nil
+	jsonData, err := transformData(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
 }
 
-func (ur *user) ReadUsersByKey(k string) (string, error) {
+func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
 	csvFile, err := openFile("./public/data.csv")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer csvFile.Close()
 
 	csvData, err := readFile(csvFile)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	jsonData, err := transformData(csvData, k)
+	jsonData, err := transformDataByKey(csvData, k)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	f, err := writeFile(jsonData)
-	if err != nil {
-		return "", err
-	}
-
-	return f, nil
+	return jsonData, nil
 }
 
 func openFile(f string) (*os.File, error) {
@@ -72,22 +71,6 @@ func openFile(f string) (*os.File, error) {
 		return nil, err
 	}
 	return csvFile, nil
-}
-
-func validateCSV(csvFile *os.File) error {
-	r := csv.NewReader(csvFile)
-	for {
-		_, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			err = fmt.Errorf("wrong number of fields or wrong format")
-			return err
-		}
-	}
-
-	return nil
 }
 
 func readFile(csvFile *os.File) (records [][]string, err error) {
@@ -100,44 +83,46 @@ func readFile(csvFile *os.File) (records [][]string, err error) {
 	return csvData, err
 }
 
-func writeFile(jsonData []Data) (string, error) {
-	var filePath = "./public/data_by_key.csv"
-	csvFile, err := os.Create(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer csvFile.Close()
-
-	writer := csv.NewWriter(csvFile)
-
-	for _, temp := range jsonData {
-		var row []string
-		row = append(row, temp.Value)
-		writer.Write(row)
-	}
-
-	writer.Flush()
-
-	return filePath, nil
-}
-
-func transformData(csvData [][]string, k string) ([]Data, error) {
-
-	var oneRecord Data
-	var allRecords []Data
+func transformDataByKey(csvData [][]string, k string) ([]*model.CustomCSV, error) {
+	var oneRecord model.CustomCSV
+	var allRecords []model.CustomCSV
 
 	for i, _ := range csvData[0] {
 		if strings.ToLower(strings.TrimSpace(csvData[0][i])) == strings.ToLower(k) {
-			for _, e := range csvData {
-				oneRecord.Value = string(e[i])
-				allRecords = append(allRecords, oneRecord)
+			for j, e := range csvData {
+				if j != 0 {
+					oneRecord.Value = strings.TrimSpace(string(e[i]))
+					allRecords = append(allRecords, oneRecord)
+				}
 			}
 		}
 	}
 
 	r, err := json.Marshal(allRecords)
-	var jsonData []Data
+	var jsonData []*model.CustomCSV
 	err = json.Unmarshal(r, &jsonData)
 
+	return jsonData, err
+}
+
+func transformData(csvData [][]string) ([]*model.User, error) {
+	var oneRecord model.User
+	var allRecords []model.User
+
+	for i, each := range csvData {
+		if i != 0 {
+			oneRecord.Id , _ = strconv.Atoi(strings.TrimSpace(each[0]))
+			oneRecord.Name = strings.TrimSpace(each[1])
+			oneRecord.Username = strings.TrimSpace(each[2])
+			oneRecord.Email = strings.TrimSpace(each[3])
+			oneRecord.Phone = strings.TrimSpace(each[4])
+			oneRecord.Website = strings.TrimSpace(each[5])
+			allRecords = append(allRecords, oneRecord)
+		}
+	}
+
+	r, err := json.Marshal(allRecords) // convert to JSON
+	var jsonData []*model.User
+	err = json.Unmarshal(r, &jsonData)
 	return jsonData, err
 }
