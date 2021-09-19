@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"academy-go-q32021/domain/model"
 	"academy-go-q32021/usecase/interactor"
 	"net/http"
 )
@@ -11,20 +10,32 @@ type user struct {
 }
 
 type User interface {
-	GetUsers(c Context) error
+	ReadUsers(c Context) error
+	ReadUsersByKey(c Context) error
 }
 
 func NewUserController(us interactor.User) User {
 	return &user{us}
 }
 
-func (uc *user) GetUsers(c Context) error {
-	var u []*model.User
+func (uc *user) ReadUsers(c Context) error {
+	f := "./public/data.csv"
 
-	u, err := uc.user.Get(u)
+	f, err := uc.user.ReadUsers(f)
+
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, u)
+	return c.File(f)
+}
+func (uc *user) ReadUsersByKey(c Context) error {
+	k := c.QueryParam("key")
+
+	f, err := uc.user.ReadUsersByKey(k)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.File(f)
 }

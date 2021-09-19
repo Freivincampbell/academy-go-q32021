@@ -1,81 +1,143 @@
 package repository
 
 import (
-	"academy-go-q32021/domain/model"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
+	"io"
 	"os"
-	"strconv"
+	"strings"
 )
 
 type user struct {
 }
 
+type Data struct {
+	Value string `json:"value"`
+}
+
 type User interface {
-	FindAll(u []*model.User) ([]*model.User, error)
+	ReadUsers(f string) (string, error)
+	ReadUsersByKey(f string) (string, error)
 }
 
 func NewUserRepository() User {
 	return &user{}
 }
 
-func (ur *user) FindAll(u []*model.User) ([]*model.User, error) {
-	response, err := http.Get("https://jsonplaceholder.typicode.com/users")
-
+func (ur *user) ReadUsers(f string) (string, error) {
+	csvFile, err := openFile(f)
 	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+		return "", err
 	}
 
-	err = json.NewDecoder(response.Body).Decode(&u)
+	err = validateCSV(csvFile)
 	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+		return "", err
 	}
 
-	storeInCSV(u)
-
-	return u, nil
+	return f, nil
 }
 
-func storeInCSV(us []*model.User) {
-	csvFile, err := os.Create("./public/data.csv")
-
+func (ur *user) ReadUsersByKey(k string) (string, error) {
+	csvFile, err := openFile("./public/data.csv")
 	if err != nil {
-		log.Fatalln(err)
+		return "", err
 	}
-	defer func(csvFile *os.File) {
-		err := csvFile.Close()
-		if err != nil {
-			log.Fatalln(err)
+
+	defer csvFile.Close()
+
+	csvData, err := readFile(csvFile)
+	if err != nil {
+		return "", err
+	}
+
+	jsonData, err := transformData(csvData, k)
+	if err != nil {
+		return "", err
+	}
+
+	f, err := writeFile(jsonData)
+	if err != nil {
+		return "", err
+	}
+
+	return f, nil
+}
+
+func openFile(f string) (*os.File, error) {
+	csvFile, err := os.Open(f)
+	if err != nil {
+		err = fmt.Errorf("path provided was not found")
+		return nil, err
+	}
+	return csvFile, nil
+}
+
+func validateCSV(csvFile *os.File) error {
+	r := csv.NewReader(csvFile)
+	for {
+		_, err := r.Read()
+		if err == io.EOF {
+			break
 		}
-	}(csvFile)
+		if err != nil {
+			err = fmt.Errorf("wrong number of fields or wrong format")
+			return err
+		}
+	}
+
+	return nil
+}
+
+func readFile(csvFile *os.File) (records [][]string, err error) {
+	reader := csv.NewReader(csvFile)
+
+	reader.FieldsPerRecord = -1
+
+	csvData, err := reader.ReadAll()
+
+	return csvData, err
+}
+
+func writeFile(jsonData []Data) (string, error) {
+	var filePath = "./public/data_by_key.csv"
+	csvFile, err := os.Create(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer csvFile.Close()
 
 	writer := csv.NewWriter(csvFile)
 
-	var row []string
-	row = append(row, "Id", "Name", "Username", "Email", "Phone", "Website")
-	err = writer.Write(row)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	row = nil
-	for _, u := range us {
-		row = append(row, strconv.Itoa(u.Id))
-		row = append(row, u.Name)
-		row = append(row, u.Username)
-		row = append(row, u.Email)
-		row = append(row, u.Phone)
-		row = append(row, u.Website)
-		err := writer.Write(row)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		row = nil
+	for _, temp := range jsonData {
+		var row []string
+		row = append(row, temp.Value)
+		writer.Write(row)
 	}
 
 	writer.Flush()
+
+	return filePath, nil
+}
+
+func transformData(csvData [][]string, k string) ([]Data, error) {
+
+	var oneRecord Data
+	var allRecords []Data
+
+	for i, _ := range csvData[0] {
+		if strings.ToLower(strings.TrimSpace(csvData[0][i])) == strings.ToLower(k) {
+			for _, e := range csvData {
+				oneRecord.Value = string(e[i])
+				allRecords = append(allRecords, oneRecord)
+			}
+		}
+	}
+
+	r, err := json.Marshal(allRecords)
+	var jsonData []Data
+	err = json.Unmarshal(r, &jsonData)
+
+	return jsonData, err
 }
