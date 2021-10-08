@@ -12,17 +12,18 @@ type user struct {
 }
 
 type User interface {
-	ReadUsers(f string) ([]*model.User, error)
+	ReadUsers() ([]*model.User, error)
 	ReadUsersByKey(k string) ([]*model.CustomCSV, error)
 	GetUsers(u []*model.User) ([]*model.User, error)
+	GetUserById(id int) (*model.User, error)
 }
 
 func NewUserInteractor(r repository.User, p presenter.User) User {
 	return &user{r, p}
 }
 
-func (us *user) ReadUsers(f string) ([]*model.User, error) {
-	file, err := us.UserRepository.ReadUsers(f)
+func (us *user) ReadUsers() ([]*model.User, error) {
+	file, err := us.UserRepository.ReadUsers()
 	if err != nil {
 		return nil, err
 	}
@@ -45,5 +46,19 @@ func (us *user) GetUsers(u []*model.User) ([]*model.User, error) {
 		return nil, err
 	}
 
-	return us.UserPresenter.ResponseGetUsers(u), nil
+	u, err = us.UserPresenter.ResponseGetUsers(u)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
+}
+
+func (us *user) GetUserById(id int) (*model.User, error) {
+	u, err := us.UserRepository.GetUserById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return us.UserPresenter.ResponseGetUserById(u), nil
 }
