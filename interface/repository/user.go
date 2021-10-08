@@ -14,17 +14,21 @@ import (
 type user struct{}
 
 type User interface {
-	ReadUsers(f string) ([]*model.User, error)
+	ReadUsers() ([]*model.User, error)
 	ReadUsersByKey(f string) ([]*model.CustomCSV, error)
 	GetUsers(u []*model.User) ([]*model.User, error)
+	GetUserById(id int) (*model.User, error)
 }
+
+var URL = "https://jsonplaceholder.typicode.com/users/"
+var CSVFILE = "./public/data.csv"
 
 func NewUserRepository() User {
 	return &user{}
 }
 
-func (ur *user) ReadUsers(f string) ([]*model.User, error) {
-	csvFile, err := openFile(f)
+func (ur *user) ReadUsers() ([]*model.User, error) {
+	csvFile, err := openFile(CSVFILE)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +49,7 @@ func (ur *user) ReadUsers(f string) ([]*model.User, error) {
 }
 
 func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
-	csvFile, err := openFile("./public/data.csv")
+	csvFile, err := openFile(CSVFILE)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +70,7 @@ func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
 }
 
 func (ur *user) GetUsers(u []*model.User) ([]*model.User, error) {
-	response, err := http.Get("https://jsonplaceholder.typicode.com/users")
+	response, err := http.Get(URL)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +80,19 @@ func (ur *user) GetUsers(u []*model.User) ([]*model.User, error) {
 		return nil, err
 	}
 
-	err = storeInCSV(u)
+	return u, nil
+}
+
+func (ur *user) GetUserById(id int) (*model.User, error) {
+	endPoint := fmt.Sprint(URL, id)
+	response, err := http.Get(endPoint)
+	if err != nil {
+		return nil, err
+	}
+
+	var u *model.User
+
+	err = json.NewDecoder(response.Body).Decode(&u)
 	if err != nil {
 		return nil, err
 	}
@@ -145,48 +161,4 @@ func transformData(csvData [][]string) ([]*model.User, error) {
 	var jsonData []*model.User
 	err = json.Unmarshal(r, &jsonData)
 	return jsonData, err
-}
-
-func storeInCSV(us []*model.User) error {
-	csvFile, err := os.Create("./public/data.csv")
-
-	if err != nil {
-		return err
-	}
-	defer func(csvFile *os.File) {
-		err := csvFile.Close()
-		if err != nil {
-			return
-		}
-	}(csvFile)
-
-	writer := csv.NewWriter(csvFile)
-
-	var row []string
-	row = append(row, "Id", "Name", "Username", "Email", "Phone", "Website")
-
-	err = writer.Write(row)
-	if err != nil {
-		return err
-	}
-
-	row = nil
-	for _, u := range us {
-		row = append(row, strconv.Itoa(u.Id))
-		row = append(row, u.Name)
-		row = append(row, u.Username)
-		row = append(row, u.Email)
-		row = append(row, u.Phone)
-		row = append(row, u.Website)
-		err := writer.Write(row)
-		if err != nil {
-			return err
-		}
-
-		row = nil
-	}
-
-	writer.Flush()
-
-	return nil
 }
