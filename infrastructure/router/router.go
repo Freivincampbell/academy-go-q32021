@@ -23,5 +23,9 @@ func NewRouter(e *echo.Echo, c controller.App) *echo.Echo {
 		return c.User.GetUserById(context)
 	})
 
+	e.GET("/users/concurrently", func(context echo.Context) error {
+		return c.User.GetUsersConcurrently(context)
+	})
+
 	return e
 }
