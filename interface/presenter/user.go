@@ -14,6 +14,7 @@ type User interface {
 	ResponseReadUsersByKey(u []*model.CustomCSV) []*model.CustomCSV
 	ResponseGetUsers(u []*model.User) ([]*model.User, error)
 	ResponseGetUserById(u *model.User) *model.User
+	ResponseGetUsersConcurrently(u []*model.User) []*model.User
 }
 
 var CSVFILE = "./public/data.csv"
@@ -40,6 +41,10 @@ func (up *user) ResponseGetUsers(u []*model.User) ([]*model.User, error) {
 }
 
 func (up *user) ResponseGetUserById(u *model.User) *model.User {
+	return u
+}
+
+func (up *user) ResponseGetUsersConcurrently(u []*model.User) []*model.User {
 	return u
 }
 

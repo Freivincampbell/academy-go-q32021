@@ -5,11 +5,16 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
+
+var wg sync.WaitGroup
+var lock = new(sync.Mutex)
 
 type user struct{}
 
@@ -18,6 +23,7 @@ type User interface {
 	ReadUsersByKey(f string) ([]*model.CustomCSV, error)
 	GetUsers(u []*model.User) ([]*model.User, error)
 	GetUserById(id int) (*model.User, error)
+	GetUsersConcurrently(itemType string, items, itemsWorker int) ([]*model.User, error)
 }
 
 var URL = "https://jsonplaceholder.typicode.com/users/"
@@ -48,6 +54,7 @@ func (ur *user) ReadUsers() ([]*model.User, error) {
 	return jsonData, nil
 }
 
+// ReadUsersByKey read users from CSV by key
 func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
 	csvFile, err := openFile(CSVFILE)
 	if err != nil {
@@ -69,6 +76,7 @@ func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
 	return jsonData, nil
 }
 
+// GetUsers read users from CSV
 func (ur *user) GetUsers(u []*model.User) ([]*model.User, error) {
 	response, err := http.Get(URL)
 	if err != nil {
@@ -83,6 +91,7 @@ func (ur *user) GetUsers(u []*model.User) ([]*model.User, error) {
 	return u, nil
 }
 
+// GetUserById get user by id from API
 func (ur *user) GetUserById(id int) (*model.User, error) {
 	endPoint := fmt.Sprint(URL, id)
 	response, err := http.Get(endPoint)
@@ -100,6 +109,44 @@ func (ur *user) GetUserById(id int) (*model.User, error) {
 	return u, nil
 }
 
+// GetUsersConcurrently get users concurrently
+func (ur *user) GetUsersConcurrently(itemType string, items, itemsWorker int) ([]*model.User, error) {
+	var result [][]string
+	content := make(chan []string, items)
+	workers := items / itemsWorker
+
+	file, err := openFile(CSVFILE)
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	r := csv.NewReader(file)
+
+	for w := 0; w <= workers; w++ {
+		wg.Add(1)
+		go worker(r, itemType, itemsWorker, content)
+	}
+
+	go func(rows chan []string) {
+		wg.Wait()
+		close(rows)
+	}(content)
+
+	for row := range content {
+		result = append(result, row)
+	}
+
+	jsonData, err := transformData(result)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
+}
+
+// openFile to open files with a path name
 func openFile(f string) (*os.File, error) {
 	csvFile, err := os.Open(f)
 	if err != nil {
@@ -109,6 +156,7 @@ func openFile(f string) (*os.File, error) {
 	return csvFile, nil
 }
 
+// readFile to read files with a path name
 func readFile(csvFile *os.File) (records [][]string, err error) {
 	reader := csv.NewReader(csvFile)
 
@@ -119,6 +167,7 @@ func readFile(csvFile *os.File) (records [][]string, err error) {
 	return csvData, err
 }
 
+// transformDataByKey to transform all data and return it as model
 func transformDataByKey(csvData [][]string, k string) ([]*model.CustomCSV, error) {
 	var oneRecord model.CustomCSV
 	var allRecords []model.CustomCSV
@@ -141,6 +190,7 @@ func transformDataByKey(csvData [][]string, k string) ([]*model.CustomCSV, error
 	return jsonData, err
 }
 
+// transformData to transform all data and return it as model
 func transformData(csvData [][]string) ([]*model.User, error) {
 	var oneRecord model.User
 	var allRecords []model.User
@@ -161,4 +211,47 @@ func transformData(csvData [][]string) ([]*model.User, error) {
 	var jsonData []*model.User
 	err = json.Unmarshal(r, &jsonData)
 	return jsonData, err
+}
+
+// worker to read all lines and write data on the channel
+func worker(r *csv.Reader, itemType string, itemsWorker int, content chan<- []string) {
+	defer wg.Done()
+	counter := 0
+
+	for {
+		if counter == itemsWorker {
+			break
+		}
+
+		lock.Lock()
+		row, err := r.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		if len(row) == 0 {
+			break
+		}
+
+		if validateType(itemType, row) {
+			content <- row
+		}
+
+		lock.Unlock()
+		counter++
+	}
+}
+
+// validateType to return valid data to storage into channel
+func validateType(itemType string, row []string) bool {
+	id, _ := strconv.Atoi(strings.TrimSpace(row[0]))
+	switch itemType {
+	case "odd":
+		return id%2 != 0
+	case "even":
+		return id%2 == 0
+	default:
+		return false
+	}
 }
