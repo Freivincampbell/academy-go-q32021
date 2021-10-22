@@ -2,6 +2,7 @@ package repository
 
 import (
 	"academy-go-q32021/domain/model"
+	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
 )
@@ -60,6 +61,25 @@ func TestUser(t *testing.T) {
 	t.Run("Open File does find path", func(t *testing.T) {
 		_, err := NewUserRepository().ReadUsers()
 		if err.Error() != "path provided was not found" {
+			t.Fail()
+		}
+	})
+
+	t.Run("Mock Data from API Call", func(t *testing.T) {
+		mockCtrl := gomock.NewController(t)
+		defer mockCtrl.Finish()
+		mockUserRepo := NewUserRepository()
+		u, _ := mockUserRepo.GetUserById(1)
+		mockData := model.User{
+			Id:       1,
+			Name:     "Leanne Graham",
+			Username: "Bret",
+			Email:    "Sincere@april.biz",
+			Phone:    "1-770-736-8031 x56442",
+			Website:  "hildegard.org",
+		}
+
+		if u.Id != mockData.Id {
 			t.Fail()
 		}
 	})

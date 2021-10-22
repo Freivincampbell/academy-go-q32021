@@ -85,6 +85,9 @@ func (uc *user) GetUsersConcurrently(c Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
+	if items < itemsWorker  {
+		return c.JSON(http.StatusBadRequest, "Items can not be lower than items for worker")
+	}
 
 	itemType := c.QueryParam("type")
 	if itemType != "odd" && itemType != "even" {

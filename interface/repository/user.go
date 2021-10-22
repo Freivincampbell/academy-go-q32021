@@ -33,6 +33,7 @@ func NewUserRepository() User {
 	return &user{}
 }
 
+// ReadUsers read users from CSV
 func (ur *user) ReadUsers() ([]*model.User, error) {
 	csvFile, err := openFile(CSVFILE)
 	if err != nil {
@@ -46,7 +47,7 @@ func (ur *user) ReadUsers() ([]*model.User, error) {
 		return nil, err
 	}
 
-	jsonData, err := transformData(data)
+	jsonData, err := transformData(data, true)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +77,7 @@ func (ur *user) ReadUsersByKey(k string) ([]*model.CustomCSV, error) {
 	return jsonData, nil
 }
 
-// GetUsers read users from CSV
+// GetUsers read users from API
 func (ur *user) GetUsers(u []*model.User) ([]*model.User, error) {
 	response, err := http.Get(URL)
 	if err != nil {
@@ -124,7 +125,7 @@ func (ur *user) GetUsersConcurrently(itemType string, items, itemsWorker int) ([
 
 	r := csv.NewReader(file)
 
-	for w := 0; w <= workers; w++ {
+	for w := 1; w <= workers; w++ {
 		wg.Add(1)
 		go worker(r, itemType, itemsWorker, content)
 	}
@@ -138,7 +139,7 @@ func (ur *user) GetUsersConcurrently(itemType string, items, itemsWorker int) ([
 		result = append(result, row)
 	}
 
-	jsonData, err := transformData(result)
+	jsonData, err := transformData(result, false)
 	if err != nil {
 		return nil, err
 	}
@@ -191,12 +192,12 @@ func transformDataByKey(csvData [][]string, k string) ([]*model.CustomCSV, error
 }
 
 // transformData to transform all data and return it as model
-func transformData(csvData [][]string) ([]*model.User, error) {
+func transformData(csvData [][]string, skip bool) ([]*model.User, error) {
 	var oneRecord model.User
 	var allRecords []model.User
 
 	for i, each := range csvData {
-		if i != 0 {
+		if i != 0 || !skip {
 			oneRecord.Id, _ = strconv.Atoi(strings.TrimSpace(each[0]))
 			oneRecord.Name = strings.TrimSpace(each[1])
 			oneRecord.Username = strings.TrimSpace(each[2])
@@ -236,16 +237,19 @@ func worker(r *csv.Reader, itemType string, itemsWorker int, content chan<- []st
 
 		if validateType(itemType, row) {
 			content <- row
+			counter++
 		}
 
 		lock.Unlock()
-		counter++
 	}
 }
 
 // validateType to return valid data to storage into channel
 func validateType(itemType string, row []string) bool {
 	id, _ := strconv.Atoi(strings.TrimSpace(row[0]))
+	if id == 0 {
+		return false
+	}
 	switch itemType {
 	case "odd":
 		return id%2 != 0
