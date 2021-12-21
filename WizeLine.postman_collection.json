@@ -267,6 +267,46 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Read Data from CSV concurrently",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/users/concurrently?items=2&items_per_workers=1&type=odd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"concurrently"
+					],
+					"query": [
+						{
+							"key": "items",
+							"value": "2"
+						},
+						{
+							"key": "items_per_workers",
+							"value": "1"
+						},
+						{
+							"key": "type",
+							"value": "odd"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

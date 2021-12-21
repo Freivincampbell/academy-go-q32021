@@ -7,4 +7,5 @@ type User interface {
 	ReadUsersByKey(k string) ([]*model.CustomCSV, error)
 	GetUsers(u []*model.User) ([]*model.User, error)
 	GetUserById(id int) (*model.User, error)
+	GetUsersConcurrently(itemType string, items, itemsWorker int) ([]*model.User, error)
 }

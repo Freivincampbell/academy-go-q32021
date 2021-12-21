@@ -7,4 +7,5 @@ type User interface {
 	ResponseReadUsersByKey(u []*model.CustomCSV) []*model.CustomCSV
 	ResponseGetUsers(u []*model.User) ([]*model.User, error)
 	ResponseGetUserById(u *model.User) *model.User
+	ResponseGetUsersConcurrently(u []*model.User) []*model.User
 }

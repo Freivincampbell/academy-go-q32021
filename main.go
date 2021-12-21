@@ -5,7 +5,6 @@ import (
 	"academy-go-q32021/infrastructure/router"
 	"academy-go-q32021/registry"
 	"fmt"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/labstack/echo"
 	"log"
 )
