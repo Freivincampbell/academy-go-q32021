@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"academy-go-q32021/domain/model"
 	"academy-go-q32021/usecase/interactor"
 	"net/http"
+	"strconv"
 )
 
 type user struct {
@@ -12,6 +14,8 @@ type user struct {
 type User interface {
 	ReadUsers(c Context) error
 	ReadUsersByKey(c Context) error
+	GetUsers(c Context) error
+	GetUserById(c Context) error
 }
 
 func NewUserController(us interactor.User) User {
@@ -19,23 +23,47 @@ func NewUserController(us interactor.User) User {
 }
 
 func (uc *user) ReadUsers(c Context) error {
-	f := "./public/data.csv"
-
-	f, err := uc.user.ReadUsers(f)
+	u, err := uc.user.ReadUsers()
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.File(f)
+	return c.JSON(http.StatusOK, u)
 }
+
 func (uc *user) ReadUsersByKey(c Context) error {
 	k := c.QueryParam("key")
 
-	f, err := uc.user.ReadUsersByKey(k)
+	u, err := uc.user.ReadUsersByKey(k)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.File(f)
+	return c.JSON(http.StatusOK, u)
+}
+
+func (uc *user) GetUsers(c Context) error {
+	var u []*model.User
+
+	u, err := uc.user.GetUsers(u)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, u)
+}
+
+func (uc *user) GetUserById(c Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	u, err := uc.user.GetUserById(id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, u)
 }

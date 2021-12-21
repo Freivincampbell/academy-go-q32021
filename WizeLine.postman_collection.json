@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "294b489f-96b5-448f-b399-549d97485af8",
+		"name": "WizeLine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Read Data from CSV",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By Name",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users-by-key?key=name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users-by-key"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "name"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By Website",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users-by-key?key=website",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users-by-key"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "website"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By Id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users-by-key?key=id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users-by-key"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By phone",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users-by-key?key=phone",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users-by-key"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "phone"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By username",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users-by-key?key=username",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users-by-key"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "username"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By email",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/read-users-by-key?key=email",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"read-users-by-key"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "email"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from API",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from CSV By IdUnique",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "key",
+						"value": "name",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/users/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

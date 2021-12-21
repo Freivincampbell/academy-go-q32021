@@ -5,4 +5,5 @@ type Context interface {
 	Bind(i interface{}) error
 	File(file string) (err error)
 	QueryParam(s string) string
+	Param(s string) string
 }
